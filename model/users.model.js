@@ -21,12 +21,13 @@ const userSchema = new mongoose.Schema({
     profileImage:{type: String, required: false},
     verifiedUser: {type: Boolean, required: false, default: false},
     lastedVisited: {type: String, required: false},
-    loginStatus:{type: Boolean, required: false, default: false}
+    loginStatus:{type: Boolean, required: false, default: false},
+    firstLoginStatus:{type: Boolean, required: false, default: false}
 },{
     timestamps: true
 
 });
-//Date and time 
+//Date and time in uuid
 var timestamp = new Date();
 var date = timestamp.getFullYear()+''+(timestamp.getMonth()+1)+''+timestamp.getDate();
 var time = timestamp.getHours()+''+timestamp.getMinutes()+''+timestamp.getSeconds();

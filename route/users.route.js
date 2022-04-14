@@ -2,6 +2,7 @@ const router = require("express").Router();
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
+const {authVerification} = require('../middleware/auth');
 
 //Importing userSchema
 const userSchema = require('../model/users.model');
@@ -11,21 +12,20 @@ router.post('/userSignUp',async(req,res)=>{
    
     try {
 
-        //const username = req.body.username;
-        //const email = req.body.email;
-        //const mobileNumber = req.body.mobileNumber;
+        const username = req.body.username;
+        const email = req.body.email;
+        const mobileNumber = req.body.mobileNumber;
         
-        if(req.body.username){
-            
-            //var reg=/^([a-z]{2})?([0-9]+)$/i
-            if(req.body.username.search(/\d/)==-1){
+        if(username){
+        
+            if(username.search(/\d/)==-1){
                 return res.json({status:"Failure",message:'username must contain atleast one number'})
-            }else if(req.body.username.search(/^[A-Za-z0-9]+$/)){
+        }else if(username.search(/^[A-Za-z0-9]+$/)){
                 return res.json({status:"Failure",message:'username must not contain any special character'})
-            }else if(req.body.username.search(/[a-zA-Z]/)==-1){
+        }else if(username.search(/[a-zA-Z]/)==-1){
                 return res.json({status:"Failure",message:'username must contain atleast one alphabet character'})
             }
-            let usernameDetail = await userSchema.findOne({'username': req.body.username}).exec()
+            let usernameDetail = await userSchema.findOne({'username': username}).exec()
             if(usernameDetail){
                 return res.json({status: "failure", message: 'username already exist'})
             }
@@ -33,8 +33,8 @@ router.post('/userSignUp',async(req,res)=>{
             return res.status(400).json({status: "failure", message: 'Must attach the username'})
         }
 
-        if(req.body.mobileNumber){
-            let usermobileNumberDetail = await userSchema.findOne({'mobileNumber': req.body.mobileNumber}).exec()
+        if(mobileNumber){
+            let usermobileNumberDetail = await userSchema.findOne({'mobileNumber': mobileNumber}).exec()
             if(usermobileNumberDetail){
                 return res.json({status: "failure", message: 'mobileNumber already exist'})
             }
@@ -42,8 +42,8 @@ router.post('/userSignUp',async(req,res)=>{
             return res.status(400).json({status: "failure", message: 'Must attach the mobileNumber'})
         }
 
-        if(req.body.email){
-            let useremailDetail = await userSchema.findOne({'email': req.body.email}).exec()
+        if(email){
+            let useremailDetail = await userSchema.findOne({'email': email}).exec()
             if(useremailDetail){
                 return res.json({status: "failure", message: 'email already exist'})
             }
@@ -72,7 +72,7 @@ router.post('/userSignUp',async(req,res)=>{
 });
 
 //api for login
-router.post('/userLogin',async(req,res)=>{
+router.post('/userLogin',authVerification,async(req,res)=>{
     try{
         let username = req.body.username;
         let password = req.body.password;
@@ -98,7 +98,7 @@ router.post('/userLogin',async(req,res)=>{
                   var userInfo = userDetails.toObject()
                   let jwttoken = jwt.sign(payload, process.env.secretKey)
                   userInfo.jwttoken = jwttoken;
-                  return res.status(200).json({status:'success',message:'Login Successfully',data:{userInfo,jwttoken}})
+                  return res.status(200).json({status:'success',message:'Login Successfully',data:userInfo})
                }else{
                    return res.status(400).json({status:'Failure',message:'Login Failed'})
                }

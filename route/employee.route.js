@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const employeeSchema = require('../model/employee.model');
-
+//const usersSchema = require('../model/users.model');
+const organizationSchema = require('../model/organization.model');
 
 //create operation on employee data
+
 router.post('/addNewEmpData',async(req,res)=>{
     try{
         if(req.body.employeeName.search(/^[A-Za-z]+$/)){
@@ -98,10 +100,51 @@ router.delete('/deleteEmployeeData/:emp_uuid',async(req,res)=>{
     }
 });
  
+
+
+
+router.get('/employeeBasedonUser',async(req,res)=>{
+
+    console.log("employeeBasedonUser......");
+    try{
+            let employeeDetails=await organizationSchema.aggregate([
+                {
+                    '$lookup':{
+                        from:'employees',
+                        localField:'uuid',
+                        foreignField:'organizationuuid',
+                        as:'employee_details'
+
+                    }
+                }
+            ])
+               console.log("employeeDetails..."+employeeDetails)
+             if(employeeDetails.length>0){
+                 return res.status(200).json({'status':'success',message:"Employee details Successfully",'result':employeeDetails})
+             }else{
+                return res.status(400).json({'status':'failure',message: error.message})
+
+             }
+
+    }catch(error){
+        console.log(error.message);
+        return res.status(400).json({"status": 'failure', 'message': error.message})
+    }
+});
+
+
+router.post('/addOrganization', async(req,res)=>{
+    try{
+        const data = new orgg(req.body);
+        const result = await data.save()
+        return res.status(200).json({status: "success", message: 'organization added successfully', result: result})
+    }catch(error){
+        console.log(error.message);
+        return res.status(400).json({"status": 'failure', 'message': error.message})
+    }
+});
+
 module.exports = router;
-
-
-
 
 
 

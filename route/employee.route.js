@@ -103,11 +103,20 @@ router.delete('/deleteEmployeeData/:emp_uuid',async(req,res)=>{
 
 
 
-router.get('/employeeBasedonUser',async(req,res)=>{
+router.get('/userBasedEmployee',async(req,res)=>{
 
-    console.log("employeeBasedonUser......");
+    console.log("userBasedEmployee.....");
     try{
             let employeeDetails=await organizationSchema.aggregate([
+
+                {
+                    $match:{
+                        $and:[
+                            {"uuid":req.query.uuid},
+                            {"userUuid":req.query.userUuid}
+                        ]
+                    }
+                },
                 {
                     '$lookup':{
                         from:'employees',
@@ -116,26 +125,47 @@ router.get('/employeeBasedonUser',async(req,res)=>{
                         as:'employee_details'
 
                     }
-                }
+                },
+                {
+                    '$lookup':{
+                        from:'user',
+                        localField:'userUuid',
+                        foreignField:'uuid',
+                        as:'user_Data'
+                    }
+                },
+              {
+                  '$unwind':{
+                      path:'$employee_details',
+                      preserveNullAndEmptyArrays:true
+                  }
+              },
+              {
+                  '$unwind':{
+                      path:'$user_Data',
+                      preserveNullAndEmptyArrays:true
+                  }
+              },
+              
             ])
                console.log("employeeDetails..."+employeeDetails)
              if(employeeDetails.length>0){
-                 return res.status(200).json({'status':'success',message:"Employee details Successfully",'result':employeeDetails})
+                 return res.status(200).json({'status':'success',message:"Employee details Fetched Successfully",'result':employeeDetails})
              }else{
-                return res.status(400).json({'status':'failure',message: error.message})
+                return res.status(400).json({'status':'failure',message: "No matched details"})
 
              }
 
     }catch(error){
         console.log(error.message);
-        return res.status(400).json({"status": 'failure', 'message': error.message})
+        return res.status(400).json({"status": 'failure', message: error.message})
     }
 });
 
 
 router.post('/addOrganization', async(req,res)=>{
     try{
-        const data = new orgg(req.body);
+        const data = new organizationSchema(req.body);
         const result = await data.save()
         return res.status(200).json({status: "success", message: 'organization added successfully', result: result})
     }catch(error){

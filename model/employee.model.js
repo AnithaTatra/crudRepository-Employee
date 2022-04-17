@@ -11,7 +11,9 @@ const employeeSchema = new mongoose.Schema({
     employeePanNumber :{type:String,required:true},
     employeeAadharNumber : {type:String,required:true},
     employeeMaritalStatus : {type:Boolean,required:false},
-    employeeState :{type:String,required:true}
+    employeeState :{type:String,required:true},
+    userUuid : {type:String,required:true},
+    organizationuuid : {type:String,required:true}
 },
 {
 timestamps : true

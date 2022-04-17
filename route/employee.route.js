@@ -113,7 +113,8 @@ router.get('/userBasedEmployee',async(req,res)=>{
                     $match:{
                         $and:[
                             {"uuid":req.query.uuid},
-                            {"userUuid":req.query.userUuid}
+                            {"userUuid":req.query.userUuid},
+                            {"ageRestriction":{$nin:[req.query.ageRestriction]}}
                         ]
                     }
                 },
@@ -146,6 +147,15 @@ router.get('/userBasedEmployee',async(req,res)=>{
                       preserveNullAndEmptyArrays:true
                   }
               },
+              {
+                $project: {
+                    "_id": 0,
+                    "organizationName": 1,
+                    "employee_details.employeeName": 1,
+                    "user_Data.username":1
+
+                }
+            }  
               
             ])
                console.log("employeeDetails..."+employeeDetails)

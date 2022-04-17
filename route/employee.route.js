@@ -2,36 +2,23 @@ const router = require('express').Router();
 const employeeSchema = require('../model/employee.model');
 //const usersSchema = require('../model/users.model');
 const organizationSchema = require('../model/organization.model');
+//var validationStatus="false";
+const Joi = require('joi');
+const {authSchema} = require('../model/Validations.js');
 
 //create operation on employee data
 
 router.post('/addNewEmpData',async(req,res)=>{
-    try{
-        if(req.body.employeeName.search(/^[A-Za-z]+$/)){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the  valid EmployeeName "})
-        } 
-        else if(req.body.employeeName=="null" || req.body.employeeName==null){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeName "})
-        }else if(req.body.employeeId=="null" || req.body.employeeId==0){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeId"})
-        }else if(req.body.employeeAddress=="null" || req.body.employeeAddress==""){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeAddress"})
-        }else if(req.body.employeePanNumber=="null"|| req.body.employeePanNumber==""){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeePannumber"})
-        }else if(req.body.employeeAadharNumber.search(/^[0-9]*(?:\.\d{1,2})?$/)){
-            return res.status(400).json({'status': "Failed",'message':"Please enter the valid AadharNumber"})
-        }else if(req.body.employeeAadharNumber=="null"|| req.body.employeeAadharNumber=="" ){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeAadharnumber"})
-        }else if(req.body.employeeState=="null" || req.body.employeeState==""){
-            return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeState"})
-        }
-       else{
+    try{ 
+        //By Anitha T
+        const resultBody=await authSchema.validateAsync(req.body)       
+        console.log("resutl.......",resultBody);
         let empData = req.body
         console.log(empData);
         const empInfo = new employeeSchema(empData);
         const result = await empInfo.save();
         return res.status(200).json({'status':"success",'message':"Employee Data successfully created","result":result})
-       }
+    
     }catch(error){
         console.log(error.message)
         return res.status(400).json({'status':"Failure",'message':error.message})
@@ -187,6 +174,38 @@ router.post('/addOrganization', async(req,res)=>{
 module.exports = router;
 
 
+
+// function Validations(req,res){
+//     if(req.body.employeeName.search(/^[A-Za-z]+$/)){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the  valid EmployeeName "})
+
+//     } 
+//     else if(req.body.employeeName=="null" || req.body.employeeName==null){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeName "})
+//     }else if(req.body.employeeId=="null" || req.body.employeeId==0){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeId"})
+//     }else if(req.body.employeeAddress=="null" || req.body.employeeAddress==""){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeAddress"})
+//     }else if(req.body.employeePanNumber=="null"|| req.body.employeePanNumber==""){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeePannumber"})
+//     }else if(req.body.employeeAadharNumber.search(/^[0-9]*(?:\.\d{1,2})?$/)){
+//         validationStatus="false";
+//         return res.status(400).json({'status': "Failed",'message':"Please enter the valid AadharNumber"})
+//     }else if(req.body.employeeAadharNumber=="null"|| req.body.employeeAadharNumber=="" ){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeAadharnumber"})
+//     }else if(req.body.employeeState=="null" || req.body.employeeState==""){
+//         validationStatus="false";
+//         return res.status(400).json({'status':"Failed",'message':"Please enter the EmployeeState"})
+//     }else{
+//         validationStatus="true";
+//     }
+// }
 
 
 

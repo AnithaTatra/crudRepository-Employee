@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const {authVerification} = require('../middleware/auth');
+const mailSending = require('../middleware/email');
 
 //Importing userSchema
 const userSchema = require('../model/users.model');
@@ -165,5 +166,30 @@ router.post('/resetPassword', async(req,res)=>{
         return res.status(500).json({status:'Failure',message:error.message})
     }
 });
+
+//api for mailSending
+router.post('/sendMail',async(req,res)=>{
+    try{
+        const toMail = req.body.toMail;
+        const subject = req.body.subject;
+        const text = req.body.text;
+        const compose = {
+            from :"pinkyAngelQueen@gmail.com",
+            to : toMail,
+            subject : subject,
+            text : text
+        }
+        let mailData = await mailSending.mailSending(compose)
+       // console.log("Mail:...",mailData)
+      // if(mailData===1){
+        return res.status(200).json({status:'success',message:"mail sent successfully"})
+    //    }else{
+    //        return res.status(400).json({status:'Failure',message:'mail not sent'})
+    //    }
+    }catch(error){
+        console.log(error.message);
+        return res.status(500).json({status:'success',message:error.message})
+    }
+})
 
 module.exports = router;

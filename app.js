@@ -3,6 +3,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const employeeRouter = require('./route/employee.route');
+const usersRouter = require('./route/users.route');
 
 
 const val = express();
@@ -26,8 +27,10 @@ val.get("/apiCheck", async(req,res)=>{
     })
      
 val.use(express.json());
+val.set('view engine','ejs');  
 val.use('/api/v1/employee/',employeeRouter);
-    
+val.use('/api/v2/users/',usersRouter); 
+
 
 val.listen(port,()=>{
     console.log("Server started at 6000 port number");

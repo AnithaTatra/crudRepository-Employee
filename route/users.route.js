@@ -4,10 +4,10 @@ const jwt = require("jsonwebtoken");
 const moment = require("moment");
 const {authVerification} = require('../middleware/auth');
 const mailSending = require('../middleware/email');
-
 //Importing userSchema
 const userSchema = require('../model/users.model');
-
+//const fs=require('fs');
+//const { attachment } = require("express/lib/response");
 //api for insert user data
 router.post('/userSignUp',async(req,res)=>{
    
@@ -99,6 +99,8 @@ router.post('/userLogin',authVerification,async(req,res)=>{
                   var userInfo = userDetails.toObject()
                   let jwttoken = jwt.sign(payload, process.env.secretKey)
                   userInfo.jwttoken = jwttoken;
+                  // this.mailSending("Mail Success")
+
                   return res.status(200).json({status:'success',message:'Login Successfully',data:userInfo})
                }else{
                    return res.status(400).json({status:'Failure',message:'Login Failed'})
@@ -173,16 +175,40 @@ router.post('/sendMail',async(req,res)=>{
         const toMail = req.body.toMail;
         const subject = req.body.subject;
         const text = req.body.text;
-        const compose = {
-            from :"pinkyAngelQueen@gmail.com",
-            to : toMail,
-            subject : subject,
-            text : text
+        const compose={
+            from:"pinkyangelqueen123@gmail.com",
+            to:toMail,
+            subject:subject,
+            fileName:'confirmationemail.ejs',
+            attachments:{
+                filename:'abcd',
+                filePath:'../mailpdf/abcd.pdf'
+            }
+     
         }
+
+        // fs.readFile('index.html',{encoding:'utf-8'},function(err,html){
+
+        //     if(err){
+        //         console.log(err);
+        //     }else{
+                
+        //         composes={
+        //             from :"pinkyangelqueen123@gmail.com",
+        //             to : toMail,
+        //             subject : subject,
+        //             html: <h1>This is Heading</h1>
+                    
+        //         };
+                
+        //     }
+        // });
+
         let mailData = await mailSending.mailSending(compose)
        // console.log("Mail:...",mailData)
-      // if(mailData===1){
+       //if(mailData===1){
         return res.status(200).json({status:'success',message:"mail sent successfully"})
+       //}//
     //    }else{
     //        return res.status(400).json({status:'Failure',message:'mail not sent'})
     //    }

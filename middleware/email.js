@@ -1,33 +1,40 @@
-const nodemailer = require('nodemailer')
+//const nodemailer = require('nodemailer')
 const ejs = require('ejs')
 const{join}= require('path');
-
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-  // port: 465,
-   //host:"smtp.gmail.com",
-    auth:{
-        user: "pinkyangelqueen123@gmail.com",
-        pass: "pinky@123"
-    },
-    //secure:false,
+const sgMail=require("@sendgrid/mail");
+sgMail.setApiKey("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");
+// const transporter = nodemailer.createTransport({
+//     service: "gmail",
+//   // port: 465,
+//    //host:"smtp.gmail.com",
+//     auth:{
+//         user: "pinkyangelqueen123@gmail.com",
+//         pass: "pinky@123"
+//     },
+//     //secure:false,
    
-});
+// });
 
 async function mailSending(compose){
     console.log("ok")
     try{
         
-        const data= await ejs.renderFile(join(__dirname,'../templates/',compose.fileName))
+        const data= await ejs.renderFile(join(__dirname,'../templates/',compose.fileName),compose,compose.details)
         console.log(__dirname)
         const mailData= {
-            from:compose.from,
+            // to:"anitha.platosys@gmail.com",
+            // from:"anitha.platosys@gmail.com",
+            // subject:"Sekhar",
+            // text:"Sekhar M",
+            // html:"Ramu Garu"
             to:compose.to,
+            from:compose.from,
             subject:compose.subject,
-            attachments: compose.attachments,
-            html:data
+             html:data
         }
-        transporter.sendMail(mailData,(err,data)=>{
+        //sgMail.send(mailData)
+
+        sgMail.send(mailData,(err,data)=>{
            
             if(err){ 
                 console.log("err",err.message)
